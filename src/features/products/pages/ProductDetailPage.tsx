@@ -3,6 +3,7 @@ import { ErrorState } from '../../../shared/ui/ErrorState'
 import { Breadcrumb } from '../../../shared/ui/Breadcrumb'
 import { formatPrice } from '../../../shared/lib/formatPrice'
 import { useProduct } from '../hooks/useProducts'
+import { AddToCartButton } from '../../cart/components/AddToCartButton'
 
 export function Component() {
   const { id } = useParams<{ id: string }>()
@@ -69,16 +70,7 @@ export function Component() {
             )}
           </div>
 
-          <button
-            className="w-full sm:w-auto px-6 py-3 bg-cta text-white font-medium rounded-button hover:bg-cta-hover transition-colors focus:outline-none focus:ring-2 focus:ring-cta focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Añadir al carrito"
-            onClick={() => {
-              // TODO: integrar con carrito en Fase 3
-              console.warn('Añadir al carrito — pendiente de integración')
-            }}
-          >
-            Añadir al carrito
-          </button>
+          <AddToCartButton product={product} />
         </div>
       </div>
     </div>

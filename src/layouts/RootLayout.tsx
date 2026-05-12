@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router'
+import { CartIconButton } from '../features/cart/components/CartIconButton'
 
 function Logo() {
   return (
@@ -30,13 +31,15 @@ export function RootLayout() {
   return (
     <div className="min-h-screen bg-bg">
       <header className="bg-surface border-b border-gray-100 sticky top-0 z-50">
-        <div className="max-w-[1200px] mx-auto px-4 py-4 flex items-center justify-center">
+        <div className="max-w-[1200px] mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="w-10" aria-hidden="true" />
           <div className="flex items-center gap-2">
             <Logo />
             <span className="text-lg font-semibold text-text">
               Dulces Pétalos
             </span>
           </div>
+          <CartIconButton />
         </div>
       </header>
       <main className="max-w-[1200px] mx-auto px-4 py-6">
