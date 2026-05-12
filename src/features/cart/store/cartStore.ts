@@ -52,6 +52,8 @@ export const useCartStore = create<CartState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ items: state.items }),
       merge: (persisted, current) => {
+        // Zustand passes the deserialized state slice (output of partialize),
+        // which is { items: [...] } — no version field here.
         const parsed = persistedCartSchema.safeParse(persisted)
         if (!parsed.success) {
           return current

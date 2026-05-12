@@ -5,7 +5,7 @@ import { EmptyCart } from '../components/EmptyCart'
 import { Breadcrumb } from '../../../shared/ui/Breadcrumb'
 
 export function Component() {
-  const { items, subtotal } = useCart()
+  const { items, subtotal, clear } = useCart()
 
   if (items.length === 0) {
     return (
@@ -29,7 +29,7 @@ export function Component() {
           <CartList items={items} />
         </div>
         <div>
-          <CartSummary subtotal={subtotal} />
+          <CartSummary subtotal={subtotal} onClear={clear} />
         </div>
       </div>
     </div>

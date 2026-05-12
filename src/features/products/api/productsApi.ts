@@ -4,12 +4,15 @@ import { productSchema } from '../model/types'
 
 const productsResponseSchema = z.array(productSchema)
 
-export async function getProducts() {
-  const data = await httpClient<unknown[]>('/v1/product')
+export async function getProducts({ signal }: { signal?: AbortSignal } = {}) {
+  const data = await httpClient<unknown[]>('/v1/product', { signal })
   return productsResponseSchema.parse(data)
 }
 
-export async function getProduct(id: string) {
-  const data = await httpClient<unknown>(`/v1/product/${id}`)
+export async function getProduct(
+  id: string,
+  { signal }: { signal?: AbortSignal } = {}
+) {
+  const data = await httpClient<unknown>(`/v1/product/${id}`, { signal })
   return productSchema.parse(data)
 }

@@ -23,7 +23,8 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <CartSyncProvider>{children}</CartSyncProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
+      {/* Vite tree-shakes this in production builds (import.meta.env.DEV === false) */}
+      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   )
 }

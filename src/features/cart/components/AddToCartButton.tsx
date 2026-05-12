@@ -1,10 +1,17 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { Product } from '../../products/model/types'
 import { useCart } from '../hooks/useCart'
 
 export function AddToCartButton({ product }: { product: Product }) {
   const { addItem } = useCart()
   const [added, setAdded] = useState(false)
+
+  // Clear the timer if the component unmounts before the 1.5s feedback ends
+  useEffect(() => {
+    if (!added) return
+    const timer = setTimeout(() => setAdded(false), 1500)
+    return () => clearTimeout(timer)
+  }, [added])
 
   const handleClick = () => {
     addItem({
@@ -17,7 +24,6 @@ export function AddToCartButton({ product }: { product: Product }) {
       addedAt: Date.now(),
     })
     setAdded(true)
-    setTimeout(() => setAdded(false), 1500)
   }
 
   return (

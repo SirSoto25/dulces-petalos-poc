@@ -74,8 +74,10 @@ describe('cartStore', () => {
 
   it('rehydrates from localStorage', () => {
     useCartStore.setState({ items: [] })
-    const state = { state: { items: [itemB], version: 1 }, version: 1 }
-    localStorage.setItem('dulces-petalos.cart', JSON.stringify(state))
+    // Zustand persist stores: { state: <partialize output>, version: <number> }
+    // partialize returns { items: [...] }, so state slice has no version field.
+    const storageEntry = { state: { items: [itemB] }, version: 1 }
+    localStorage.setItem('dulces-petalos.cart', JSON.stringify(storageEntry))
     useCartStore.persist.rehydrate()
     expect(useCartStore.getState().items).toHaveLength(1)
     expect(useCartStore.getState().items[0].productId).toBe('2')

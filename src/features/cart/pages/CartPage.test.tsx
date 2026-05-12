@@ -66,7 +66,7 @@ describe('CartPage integration', () => {
     })
   })
 
-  it('clears cart', async () => {
+  it('clears cart after confirmation', async () => {
     useCartStore.setState({
       items: [
         {
@@ -84,11 +84,41 @@ describe('CartPage integration', () => {
     const user = userEvent.setup()
     renderWithProviders(<CartPage />, { route: '/cart' })
 
+    // First click shows confirmation dialog
     const clearBtn = screen.getByRole('button', { name: 'Vaciar carrito' })
     await user.click(clearBtn)
+
+    // Confirm by clicking "Sí, vaciar"
+    const confirmBtn = screen.getByRole('button', { name: 'Sí, vaciar' })
+    await user.click(confirmBtn)
 
     await waitFor(() => {
       expect(screen.getByText('Tu carrito está vacío')).toBeInTheDocument()
     })
+  })
+
+  it('cancels clear cart when clicking Cancelar', async () => {
+    useCartStore.setState({
+      items: [
+        {
+          productId: '1',
+          name: 'Orquídea',
+          binomialName: 'Ophrys',
+          price: 4.95,
+          imgUrl: 'https://example.com/a.jpg',
+          quantity: 1,
+          addedAt: 1,
+        },
+      ],
+    })
+
+    const user = userEvent.setup()
+    renderWithProviders(<CartPage />, { route: '/cart' })
+
+    await user.click(screen.getByRole('button', { name: 'Vaciar carrito' }))
+    await user.click(screen.getByRole('button', { name: 'Cancelar' }))
+
+    // Items still present
+    expect(screen.getByText('Orquídea')).toBeInTheDocument()
   })
 })

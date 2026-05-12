@@ -1,10 +1,12 @@
 import { createBrowserRouter } from 'react-router'
 import { RootLayout } from '../layouts/RootLayout'
+import { NotFoundPage, RouteError } from './NotFoundPage'
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <RootLayout />,
+    errorElement: <RouteError />,
     children: [
       {
         index: true,
@@ -15,7 +17,7 @@ export const router = createBrowserRouter([
         lazy: () => import('../features/products/pages/ProductDetailPage'),
       },
       { path: 'cart', lazy: () => import('../features/cart/pages/CartPage') },
-      { path: '*', element: <div>404</div> },
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
 ])

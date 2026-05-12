@@ -12,9 +12,10 @@ export function CartIconButton() {
     >
       <CartIcon />
       {totalItems > 0 && (
+        // aria-hidden: the count is already announced via the Link's aria-label above
         <span
           className="absolute -top-1 -right-1 bg-cta text-white text-xs font-medium w-5 h-5 flex items-center justify-center rounded-full"
-          aria-live="polite"
+          aria-hidden="true"
         >
           {totalItems > 99 ? '99+' : totalItems}
         </span>
