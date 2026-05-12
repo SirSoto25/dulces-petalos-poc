@@ -2,6 +2,8 @@
 
 Catálogo de productos + carrito de compras para la floristería Dulces Pétalos. Prueba técnica para Jakala.
 
+> **Última auditoría**: 2026-05-12 — análisis multi-agente aplicado post-entrega. 11 issues detectados y corregidos (2 críticos).
+
 ## Stack
 
 | Capa         | Elección                                    |
@@ -71,13 +73,32 @@ Resumen ejecutivo (el log detallado está en `AI-LOG.md`, fuera del repo):
 
 - **Planificación colaborativa**: El usuario aprobó stack y arquitectura ANTES de tocar código. Se usó un cuestionario estructurado para fijar decisiones técnicas con impacto arquitectónico.
 - **Commits incrementales**: Cada feature se desarrolló en commits pequeños y verdes. No se acumuló código sin tests.
-- **TDD vertical**: Tests antes o junto al código. MSW para mockear la API. 47 tests cubren happy path, empty, error, edge cases.
+- **TDD vertical**: Tests antes o junto al código. MSW para mockear la API. 48 tests cubren happy path, empty, error, edge cases.
 - **Validación continua**: `npm run check` (typecheck + lint + tests) se ejecutó entre cada fase.
-- **Auto-auditoría**: Se aplicó el skill `grill-me` y `caveman` para detectar over-engineering y vectores de ataque antes de entregar.
+- **Auditoría multi-agente post-entrega**: Dos agentes `general` analizaron el codebase completo en paralelo y detectaron 11 issues (2 críticos). Todos corregidos. Ver sección siguiente.
+
+## Auditoría post-entrega (2026-05-12)
+
+Análisis multi-agente aplicado sobre el codebase completo. 11 problemas detectados y corregidos:
+
+| Severidad    | Problema                                                                                                          | Fix aplicado                                                                        |
+| ------------ | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **CRITICAL** | `persistedCartSchema` incluía `version` que Zustand nunca pasa a `merge()` → carrito no rehidrataba en producción | Schema corregido a `{ items: [...] }` sin version; test fixture corregido           |
+| **CRITICAL** | `AbortSignal` no propagado → peticiones fetch continuaban en red tras navegar                                     | `getProducts/getProduct` aceptan `{ signal }`; hooks pasan signal de TanStack Query |
+| **HIGH**     | `react-query-devtools` en `dependencies` → iba al bundle de producción                                            | Movido a `devDependencies` + guard `import.meta.env.DEV`                            |
+| **MEDIUM**   | Proxy Vite muerto: `VITE_API_BASE_URL` absoluta bypassa el proxy                                                  | `.env.development` con `/api` relativa; `.env` con URL absoluta para producción     |
+| **MEDIUM**   | `CartSummary` llamaba a `useCart()` teniendo ya `subtotal` como prop → doble subscripción al store                | `onClear` como prop; `useCart()` eliminado de `CartSummary`                         |
+| **MEDIUM**   | Tests de `formatPrice` frágiles por diferencias de ICU entre entornos                                             | `toBe()` → `toMatch(/regex/)`                                                       |
+| **MEDIUM**   | `CartIconButton` anunciaba dos veces a lectores de pantalla (`aria-live` + `aria-label`)                          | `aria-live` eliminado; badge con `aria-hidden="true"`                               |
+| **LOW**      | `AddToCartButton`: `setTimeout` no limpiado en unmount                                                            | Reescrito con `useEffect` + cleanup                                                 |
+| **LOW**      | Sin `ErrorBoundary` global → crash de render blanca la app                                                        | `ErrorBoundary.tsx` + `RouteError` integrados                                       |
+| **LOW**      | Página 404 era `<div>404</div>` sin layout ni estilos                                                             | `NotFoundPage.tsx` con diseño coherente y enlace de vuelta                          |
+| **LOW**      | "Vaciar carrito" sin confirmación (inconsistente con eliminación de ítem)                                         | Confirmación inline en `CartSummary` + 2 tests nuevos                               |
 
 ## Limitaciones conocidas
 
 - La API no expone endpoint de búsqueda: filtrado es client-side. Si el catálogo crece >100 items, se debe mover a server-side.
+- El certificado TLS de `dulces-petalos.jakala.es` estaba expirado durante el desarrollo — verificado con `curl`. La app funciona contra la API simulada (MSW) en tests y contra la URL real en producción.
 - Sin PWA / service worker.
 - Sin analytics / tracking.
 - Sin i18n (español hardcoded, que es el idioma del proyecto).
