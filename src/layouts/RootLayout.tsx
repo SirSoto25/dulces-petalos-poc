@@ -30,6 +30,12 @@ function Logo() {
 export function RootLayout() {
   return (
     <div className="min-h-screen bg-bg">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-cta focus:text-white focus:px-4 focus:py-2 focus:rounded-button"
+      >
+        Saltar al contenido principal
+      </a>
       <header className="bg-surface border-b border-gray-100 sticky top-0 z-50">
         <div className="max-w-[1200px] mx-auto px-4 py-4 flex items-center justify-between">
           <div className="w-10" aria-hidden="true" />
@@ -42,7 +48,11 @@ export function RootLayout() {
           <CartIconButton />
         </div>
       </header>
-      <main className="max-w-[1200px] mx-auto px-4 py-6">
+      <main
+        id="main-content"
+        className="max-w-[1200px] mx-auto px-4 py-6"
+        tabIndex={-1}
+      >
         <Outlet />
       </main>
     </div>
