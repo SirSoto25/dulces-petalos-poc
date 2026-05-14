@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { AddToCartButton } from './AddToCartButton'
 import type { Product } from '../../products/model/types'
@@ -25,13 +26,14 @@ describe('AddToCartButton', () => {
   })
 
   it('shows feedback after click', async () => {
+    const user = userEvent.setup()
     render(
       <MemoryRouter>
         <AddToCartButton product={mockProduct} />
       </MemoryRouter>
     )
     const button = screen.getByRole('button', { name: 'Añadir al carrito' })
-    fireEvent.click(button)
+    await user.click(button)
     await waitFor(() => {
       expect(screen.getByText('Añadido ✓')).toBeInTheDocument()
     })
