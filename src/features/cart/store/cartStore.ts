@@ -3,13 +3,20 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 import type { CartState, CartItem } from '../model/types'
 import { CART_SCHEMA_VERSION, persistedCartSchema } from '../model/schema'
 
+function validateQuantity(q: number): void {
+  if (!Number.isFinite(q) || !Number.isInteger(q) || q < 1) {
+    throw new Error(`Cantidad inválida: ${q}`)
+  }
+}
+
 export const useCartStore = create<CartState>()(
   persist(
     (set) => ({
       items: [],
 
-      addItem: (item: CartItem) =>
-        set((state) => {
+      addItem: (item: CartItem) => {
+        validateQuantity(item.quantity)
+        return set((state) => {
           const existing = state.items.find(
             (i) => i.productId === item.productId
           )
@@ -23,26 +30,27 @@ export const useCartStore = create<CartState>()(
             }
           }
           return { items: [...state.items, item] }
-        }),
+        })
+      },
 
       removeItem: (productId: string) =>
         set((state) => ({
           items: state.items.filter((i) => i.productId !== productId),
         })),
 
-      updateQuantity: (productId: string, quantity: number) =>
-        set((state) => {
-          if (quantity <= 0) {
-            return {
-              items: state.items.filter((i) => i.productId !== productId),
-            }
-          }
-          return {
-            items: state.items.map((i) =>
-              i.productId === productId ? { ...i, quantity } : i
-            ),
-          }
-        }),
+      updateQuantity: (productId: string, quantity: number) => {
+        if (quantity <= 0) {
+          return set((state) => ({
+            items: state.items.filter((i) => i.productId !== productId),
+          }))
+        }
+        validateQuantity(quantity)
+        return set((state) => ({
+          items: state.items.map((i) =>
+            i.productId === productId ? { ...i, quantity } : i
+          ),
+        }))
+      },
 
       clear: () => set({ items: [] }),
     }),
